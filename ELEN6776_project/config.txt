@@ -7,5 +7,6 @@
 # NumberPeer 10
 
 # Server_IP 127.0.0.1
+# Peer_IP 127.0.0.1
 
 

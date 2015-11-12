@@ -13,6 +13,7 @@ public class Configuration {
 	
 	public static int numPeer;
 	public static String serverIP;
+	public static String peerIP;
 	
 	public static Configuration getInstance() {
 		if (INSTANCE == null) {
@@ -56,6 +57,8 @@ public class Configuration {
 							break;
 						case("Server_IP"):
 							serverIP = val;
+						case("Peer_IP"):
+							peerIP = val;
 						default:
 							break;
 						

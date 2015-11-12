@@ -17,6 +17,7 @@ public class Peer {
 	/**
 	 * Variables
 	 */
+	public static int ID;
 	
 	public static void main(String[] args)
 	{
@@ -28,7 +29,11 @@ public class Peer {
 	
 	private static void launchPeer()
 	{
-		
+		System.out.println("Plase enter the peer ID, between 0 - 31");
+		Scanner sc = new Scanner(System.in);
+		ID = sc.nextInt();
+		Peer_send send_thread = new Peer_send();
+		new Thread(send_thread).start();
 	}
 	
 
