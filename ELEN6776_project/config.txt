@@ -1,0 +1,11 @@
+## This is the configuration file
+## Change the following options to achieve different test cases
+
+## Number of peers should be an integer between 1 and 10, inclusively
+## Leave IP blank if not applicable
+
+# NumberPeer 10
+
+# Server_IP 127.0.0.1
+
+
