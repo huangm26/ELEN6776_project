@@ -1,0 +1,7 @@
+On start:
+
+	1. First start the server. The server listen at port 6000. IP address 127.0.0.1 for convenience on local machine. 
+	
+	2. Start the Peer, enter the ID of peer. The ID is from 0-31.
+	
+	

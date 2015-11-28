@@ -1,4 +1,4 @@
-package node;
+package server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,14 +9,13 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import message.Message;
-import message.RegularMessage;
-import utility.Configuration;
 
-public class Peer_send implements Runnable{
+public class Server_send implements Runnable{
+
 	private Message message;
 	private String destIP;
 	private int destPort;
-	public Peer_send(Message message, String destIP, int destPort)
+	public Server_send(Message message, String destIP, int destPort)
 	{
 		this.message = message;
 		this.destIP = destIP;
@@ -54,4 +53,5 @@ public class Peer_send implements Runnable{
 //		System.out.println("send "+ bytesend + " bytes");
 		sendSocket.close();
 	}
+
 }
