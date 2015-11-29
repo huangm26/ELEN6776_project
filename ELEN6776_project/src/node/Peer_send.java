@@ -12,6 +12,12 @@ import message.Message;
 import message.RegularMessage;
 import utility.Configuration;
 
+
+/*
+ * This is the thread used to send the message without blocking other operation. Use the constructor to pass message, destination IP address 
+ * and destination port number. The thread will send the message to destination and quit. 
+ */
+
 public class Peer_send implements Runnable{
 	private Message message;
 	private String destIP;

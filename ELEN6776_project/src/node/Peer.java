@@ -10,12 +10,12 @@ import message.RegularMessage;
 import utility.Configuration;
 
 public class Peer {
-    /**
+    /*
      * Constants
      */
 
 	
-	/**
+	/*
 	 * Variables
 	 */
 	public static int ID;
@@ -45,6 +45,7 @@ public class Peer {
 		}
 		launchPeer();
 		startListener();
+		startReadingInput();
 	}
 	
 
@@ -62,6 +63,10 @@ public class Peer {
 		new Thread(receive_thread).start();
 	}
 	
-
+	private static void startReadingInput()
+	{
+		Peer_input read_input = new Peer_input();
+		new Thread(read_input).start();
+	}
 	
 }

@@ -49,5 +49,9 @@ public class Message implements Serializable {
 		return this instanceof NotifyNewSuccessor;
 	}
 	
+	public boolean isPeerStopRequest()
+	{
+		return this instanceof PeerStopRequest;
+	}
 	
 }

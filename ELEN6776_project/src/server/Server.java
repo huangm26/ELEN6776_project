@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import message.Message;
 import message.PeerStartAck;
 import message.PeerStartRequest;
+import message.PeerStopRequest;
 import message.RegularMessage;
 import utility.Configuration;
 
@@ -56,8 +57,6 @@ public class Server {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Message message = null;
-		ByteBuffer buffer = ByteBuffer.allocate(1000);
 		
 //		while (serverSocket.read(buffer) <= 0) {
 //			try {
@@ -66,8 +65,12 @@ public class Server {
 //				e.printStackTrace();
 //			}
 //		}
+
+		Message message = null;
+		ByteBuffer buffer = ByteBuffer.allocate(4000);
 		while (true)
 		{
+			buffer.clear();
 			SocketChannel newChannel = serverSocket.accept();
 			newChannel.read(buffer);
 			buffer.flip();
@@ -82,6 +85,10 @@ public class Server {
 			if(message.isPeerStartRequest())
 			{
 				onReceivePeerStartRequest((PeerStartRequest)message);
+			}
+			else if(message.isPeerStopRequest())
+			{
+				removePeerFromList((PeerStopRequest) message);
 			}
 		}		
 	}
@@ -142,6 +149,11 @@ public class Server {
 		}
 		Server_send sendStartAck = new Server_send(ack, destIP, destPort);
 		new Thread(sendStartAck).start();
+		printList();
+	}
+	
+	private static void printList()
+	{
 		System.out.println("New List");
 		for(int i = 0; i < peerList.size(); i++)
 		{
@@ -152,5 +164,11 @@ public class Server {
 	public static void setServerIP(String myIP)
 	{
 		serverIP = myIP;
+	}
+	
+	private static void removePeerFromList(PeerStopRequest message)
+	{
+		peerList.remove((Integer)message.from);
+		printList();
 	}
 }

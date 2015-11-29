@@ -18,6 +18,10 @@ import message.PeerStartAck;
 import message.PeerStartRequest;
 import utility.Configuration;
 
+
+/*
+ * This thread is used to receive all the messages from server and other peers. When different types of messages arrives, it will handle them differently.
+ */
 public class Peer_receive implements Runnable{
 
 	/*
@@ -57,11 +61,13 @@ public class Peer_receive implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+
 		Message message = null;
 		ByteBuffer buffer = ByteBuffer.allocate(4000);
-		
 		while (true)
 		{
+			buffer.clear();
 			SocketChannel newChannel = receiveSocket.accept();
 			newChannel.read(buffer);
 			buffer.flip();
@@ -140,13 +146,19 @@ public class Peer_receive implements Runnable{
 	
 	private void updateSuccessor(NotifyNewSuccessor newSuccessor)
 	{
-		Peer.successor = newSuccessor.from;
+		if(newSuccessor.successor != Peer.ID)
+			Peer.successor = newSuccessor.successor;
+		else
+			Peer.successor = -1;
 		System.out.println("New successor with ID " + Peer.successor);
 	}
 	
 	private void updatePredecessor(NotifyNewPredecessor newPredecessor)
 	{
-		Peer.predecessor = newPredecessor.from;
+		if(newPredecessor.predecessor != Peer.ID)
+			Peer.predecessor = newPredecessor.predecessor;
+		else
+			Peer.predecessor = -1;
 		System.out.println("New Predecessor with ID " + Peer.predecessor);
 	}
 	
