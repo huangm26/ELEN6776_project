@@ -54,4 +54,8 @@ public class Message implements Serializable {
 		return this instanceof PeerStopRequest;
 	}
 	
+	public boolean isSendFingerTabel()
+	{
+		return this instanceof SendFingerTable;
+	}
 }

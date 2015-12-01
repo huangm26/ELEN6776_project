@@ -8,6 +8,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 
 import message.Message;
 import message.NotifyNewPredecessor;
@@ -16,6 +17,7 @@ import message.PeerPredecessorReply;
 import message.PeerPredecessorRequest;
 import message.PeerStartAck;
 import message.PeerStartRequest;
+import message.SendFingerTable;
 import utility.Configuration;
 
 
@@ -30,6 +32,7 @@ public class Peer_receive implements Runnable{
 	public int ID;
 	public String IPAddr;
 	public int portNum;
+	public int []fingerTable;
 	
 	public static ServerSocketChannel receiveSocket;
 	
@@ -90,6 +93,10 @@ public class Peer_receive implements Runnable{
 			else if(message.isNotifyNewPredecessor())
 			{
 				updatePredecessor((NotifyNewPredecessor) message);
+			}
+			else if(message.isSendFingerTabel())
+			{
+				updateFingerTable((SendFingerTable) message);
 			}
 		}		
 	}
@@ -162,5 +169,11 @@ public class Peer_receive implements Runnable{
 		System.out.println("New Predecessor with ID " + Peer.predecessor);
 	}
 	
+	private void updateFingerTable(SendFingerTable message)
+	{
+		this.fingerTable = message.finger_table;
+		System.out.println("Updating finger table ");
+		System.out.println(Arrays.toString(fingerTable));
+	}
 	
 }

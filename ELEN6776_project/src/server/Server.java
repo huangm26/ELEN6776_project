@@ -8,6 +8,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 import message.Message;
@@ -15,6 +16,7 @@ import message.PeerStartAck;
 import message.PeerStartRequest;
 import message.PeerStopRequest;
 import message.RegularMessage;
+import message.SendFingerTable;
 import utility.Configuration;
 
 public class Server {
@@ -100,15 +102,16 @@ public class Server {
 		int successor = -1;
 		String destIP = request.IP;
 		int destPort = request.from + 6000;
+		boolean valid = false;
 		if(peerList.contains(request.from)){
 			// The peer to be started has a invalid ID
 			System.out.println("The Peer with ID " + request.from + " already exists");
-			ack = new PeerStartAck(request.to, request.from, false, predecessor, successor);
+			ack = new PeerStartAck(request.to, request.from, valid, predecessor, successor);
 		} else
 		{
 			// The peer to be started has a valid ID
 			System.out.println("Launching the Peer with ID " + request.from);
-			
+			valid = true;
 			if(peerList.size() != 0)
 			//The list is not empty
 			{
@@ -145,10 +148,14 @@ public class Server {
 			{
 				peerList.add(request.from);
 			}
-			ack = new PeerStartAck(request.to, request.from, true, predecessor, successor);
+			ack = new PeerStartAck(request.to, request.from, valid, predecessor, successor);
 		}
 		Server_send sendStartAck = new Server_send(ack, destIP, destPort);
 		new Thread(sendStartAck).start();
+		if(valid)
+		{
+			sendFingerTable();
+		}
 		printList();
 	}
 	
@@ -170,5 +177,52 @@ public class Server {
 	{
 		peerList.remove((Integer)message.from);
 		printList();
+	}
+	
+	private static void sendFingerTable()
+	{
+		System.out.println("Preparing to send finger table");
+		System.out.println("PeerList size " + peerList.size());
+		for(int i = 0; i < peerList.size(); i++)
+		{
+			int [] fingerTable = calculateFingerTable(peerList.get(i));
+			SendFingerTable sendTable = new SendFingerTable(0, peerList.get(i), fingerTable);
+			Server_send send_thread = new Server_send(sendTable, Configuration.peerIP, peerList.get(i) + 6000);
+			new Thread(send_thread).start();
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private static int[] calculateFingerTable(int peerID)
+	{
+		int [] myTable = new int[5];
+		for(int i = 0; i < 5; i++)
+		{
+			//Larger than the last element in the circle but before the first element in the circle, set it to the first element in the circle.
+			if(((peerID + Math.pow(2,i))%32) > peerList.getLast())
+			{
+				myTable[i] = peerList.getFirst();
+			}
+			else
+			{
+				int j = 0;
+				for(j = 0; j < peerList.size(); j++)
+				{
+					if(peerList.get(j) >= ((peerID + Math.pow(2, i))%32))
+					{
+						break;
+					}
+				}
+				myTable[i] = peerList.get(j);
+			}
+			
+		}
+		return myTable;
+		
 	}
 }
