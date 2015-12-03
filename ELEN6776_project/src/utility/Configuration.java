@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import utility.Configuration;
 
@@ -14,6 +17,7 @@ public class Configuration {
 	public static int numPeer;
 	public static String serverIP;
 	public static String peerIP;
+	public static Map<String, String> messageMap;
 	
 	public static Configuration getInstance() {
 		if (INSTANCE == null) {
@@ -34,6 +38,7 @@ public class Configuration {
 	
 	private void init()
 	{
+		messageMap = new HashMap();
 	}
 	
 	private void setVariables()
@@ -57,11 +62,21 @@ public class Configuration {
 							break;
 						case("Server_IP"):
 							serverIP = val;
+							break;
 						case("Peer_IP"):
 							peerIP = val;
+							break;
 						default:
 							break;
 						
+					}
+				}
+				else if(strArr.length == 4)
+				{
+					val = strArr[3];
+					if(strArr[1] == "Message")
+					{
+						messageMap.put(strArr[2], val);
 					}
 				}
 			}
