@@ -106,14 +106,10 @@ public class Peer_input implements Runnable{
 	{
 		//Notify the successor its predecessor should be my current predecessor
 		NotifyNewPredecessor notifyPredecessor = new NotifyNewPredecessor(Peer.ID, Peer.successor, Peer.predecessor);
-//		Peer_send nPredecessor_thread = new Peer_send(notifyPredecessor, Configuration.peerIP, 6000 + notifyPredecessor.to);
-//		new Thread(nPredecessor_thread).start();
 		sendMessage(notifyPredecessor);	
 			
 		//Notify the predecessor is successor should be my current successor
 		NotifyNewSuccessor notifySuccessor = new NotifyNewSuccessor(Peer.ID, Peer.predecessor, Peer.successor);
-//		Peer_send nSuccessor_thread = new Peer_send(notifySuccessor, Configuration.peerIP, 6000 + notifySuccessor.to);
-//		new Thread(nSuccessor_thread).start();
 		sendMessage(notifySuccessor);
 	}
 

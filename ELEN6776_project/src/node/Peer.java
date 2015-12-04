@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Scanner;
 
 import message.PeerStartRequest;
-import message.RegularMessage;
 import utility.Configuration;
 
 public class Peer {

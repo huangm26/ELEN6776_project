@@ -9,6 +9,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import message.FindMessage;
 import message.InsertMessage;
@@ -152,15 +155,11 @@ public class Peer_receive implements Runnable{
 	{
 		//Notify the successor that I am the new predecessor
 		NotifyNewPredecessor notifyPredecessor = new NotifyNewPredecessor(ID, Peer.successor, ID);
-//		Peer_send nPredecessor_thread = new Peer_send(notifyPredecessor, Configuration.peerIP, 6000 + notifyPredecessor.to);
-//		new Thread(nPredecessor_thread).start();
 		sendMessage(notifyPredecessor);
 		
 		
 		//Notify the predecessor that I am the new successor
 		NotifyNewSuccessor notifySuccessor = new NotifyNewSuccessor(ID, Peer.predecessor, ID);
-//		Peer_send nSuccessor_thread = new Peer_send(notifySuccessor, Configuration.peerIP, 6000 + notifySuccessor.to);
-//		new Thread(nSuccessor_thread).start();
 		sendMessage(notifySuccessor);
 	}
 	
@@ -176,10 +175,32 @@ public class Peer_receive implements Runnable{
 	private void updatePredecessor(NotifyNewPredecessor newPredecessor)
 	{
 		if(newPredecessor.predecessor != Peer.ID)
+		{
 			Peer.predecessor = newPredecessor.predecessor;
+			transferMessage(newPredecessor);
+		}
 		else
+		{
 			Peer.predecessor = -1;
+		}
 		System.out.println("New Predecessor with ID " + Peer.predecessor);
+	}
+	
+	private void transferMessage(NotifyNewPredecessor newPredecessor)
+	{
+		int new_predecessor = newPredecessor.predecessor;
+		Iterator<Entry<String, String>> it = Peer.storage.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it.next();
+//	        System.out.println(pair.getKey() + " = " + pair.getValue());
+	        int key_val = Integer.valueOf((String)pair.getKey());
+	        if(key_val <= new_predecessor)
+	        {
+	        	InsertMessage new_message = new InsertMessage(Peer.ID, new_predecessor, (String)pair.getKey(), (String)pair.getValue());
+				sendMessage(new_message);
+				it.remove(); // avoids a ConcurrentModificationException
+	        }
+	    }
 	}
 	
 	private void updateFingerTable(SendFingerTable message)

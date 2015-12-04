@@ -13,12 +13,6 @@ public class Message implements Serializable {
 		this.to = to;
 	}
 	
-	public boolean isRegular()
-	{
-		return this instanceof RegularMessage;
-		
-	}
-	
 	public boolean isPeerStartRequest()
 	{
 		return this instanceof PeerStartRequest;

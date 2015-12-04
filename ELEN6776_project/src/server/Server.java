@@ -15,7 +15,6 @@ import message.Message;
 import message.PeerStartAck;
 import message.PeerStartRequest;
 import message.PeerStopRequest;
-import message.RegularMessage;
 import message.SendFingerTable;
 import utility.Configuration;
 
