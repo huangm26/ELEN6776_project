@@ -10,6 +10,14 @@ import utility.Configuration;
 
 public class Peer_input implements Runnable{
 
+	
+	/*
+	 * Three kind of input message 
+	 * 1. EXIT        used to shutdown the peer
+	 * 2. INSERT KEY VALUE		this is the message to insert the message into peer. The KEY being the search key, and the VALUE being value
+	 * 3. FIND KEY	  used to query the specific message with the given key as KEY
+	 */
+	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
@@ -26,9 +34,18 @@ public class Peer_input implements Runnable{
 			String content = null;
 			Scanner scanner = new Scanner(System.in);
 			content = scanner.nextLine();
-			if(content.equals("EXIT"))
+			String[] strArr = null;
+			strArr = content.split(" ");
+			switch(strArr[0])
 			{
-				System.exit(0);
+				case("EXIT"):
+					System.exit(0);
+					break;
+				case("INSERT"):
+					insertMessage(strArr[1], strArr[2]);
+					break;
+				default:
+					break;
 			}
 		}
 	}
@@ -40,8 +57,11 @@ public class Peer_input implements Runnable{
 			public void run() {
 				//On shutting down the peer. Add exit code here!!!!!!!!
 				System.out.println("Shutting down the peer " + Peer.ID);
-				notifyNeighbors();
 				notifyServer();
+				if(Peer.predecessor == -1)
+				{
+					notifyNeighbors();
+				}
 				try {
 					Thread.sleep(3000);
 				} catch (InterruptedException e) {
@@ -74,5 +94,10 @@ public class Peer_input implements Runnable{
 		PeerStopRequest stop_request = new PeerStopRequest(Peer.ID, 0);
 		Peer_send send_stop_request = new Peer_send(stop_request, Peer.serverIP, Peer.serverPort);
 		new Thread(send_stop_request).start();
+	}
+	
+	private void insertMessage(String key, String value)
+	{
+		
 	}
 }

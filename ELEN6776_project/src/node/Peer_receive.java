@@ -42,6 +42,7 @@ public class Peer_receive implements Runnable{
 		this.IPAddr = IP;
 		this.portNum = 6000 + ID;
 	}
+	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
@@ -117,6 +118,7 @@ public class Peer_receive implements Runnable{
 		}
 		
 	}
+	
 	
 	//Update the predecessor and successor of the current node, and notify the neighbors if have one
 	private void updateNeighbors(PeerStartAck ack)

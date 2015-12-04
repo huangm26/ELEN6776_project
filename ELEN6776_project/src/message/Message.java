@@ -58,4 +58,14 @@ public class Message implements Serializable {
 	{
 		return this instanceof SendFingerTable;
 	}
+	
+	public boolean isInsertMessage()
+	{
+		return this instanceof Insert_message;
+	}
+	
+	public boolean isFindMessage()
+	{
+		return this instanceof Find_message;
+	}
 }
