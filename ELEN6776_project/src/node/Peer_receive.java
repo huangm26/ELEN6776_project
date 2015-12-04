@@ -193,7 +193,7 @@ public class Peer_receive implements Runnable{
 	    while (it.hasNext()) {
 	        Map.Entry pair = (Map.Entry)it.next();
 //	        System.out.println(pair.getKey() + " = " + pair.getValue());
-	        int key_val = Integer.valueOf((String)pair.getKey());
+	        int key_val = Integer.parseInt((String)pair.getKey()) % 32;
 	        if(key_val <= new_predecessor)
 	        {
 	        	InsertMessage new_message = new InsertMessage(Peer.ID, new_predecessor, (String)pair.getKey(), (String)pair.getValue());

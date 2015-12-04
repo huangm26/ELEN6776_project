@@ -22,7 +22,7 @@ public class Peer {
 	public static int ID;
 	public static String IP;
 	public static String serverIP;
-	public static final int serverPort = 6000;
+	public static final int serverPort = 6100;
 	public static int predecessor;
 	public static int successor;
 	public static Map<String, String> storage;

@@ -22,7 +22,7 @@ public class Server {
     /**
      * Constants
      */
-	private static final int serverPort = 6000;
+	private static final int serverPort = 6100;
 	
 	/**
 	 * Variables
