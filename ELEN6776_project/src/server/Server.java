@@ -176,6 +176,7 @@ public class Server {
 	private static void removePeerFromList(PeerStopRequest message)
 	{
 		peerList.remove((Integer)message.from);
+		sendFingerTable();
 		printList();
 	}
 	

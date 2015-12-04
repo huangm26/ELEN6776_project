@@ -61,11 +61,11 @@ public class Message implements Serializable {
 	
 	public boolean isInsertMessage()
 	{
-		return this instanceof Insert_message;
+		return this instanceof InsertMessage;
 	}
 	
 	public boolean isFindMessage()
 	{
-		return this instanceof Find_message;
+		return this instanceof FindMessage;
 	}
 }

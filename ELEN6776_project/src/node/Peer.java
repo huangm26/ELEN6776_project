@@ -3,6 +3,8 @@ package node;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import message.PeerStartRequest;
@@ -24,7 +26,8 @@ public class Peer {
 	public static final int serverPort = 6000;
 	public static int predecessor;
 	public static int successor;
-	
+	public static Map<String, String> storage;
+	public static int []fingerTable;
 	
 	public static void main(String[] args)
 	{
@@ -34,6 +37,7 @@ public class Peer {
 		serverIP = Configuration.serverIP;
 		predecessor = -1;
 		successor = -1;
+		storage = new HashMap<String, String>();
 		System.out.println("Plase enter the peer ID, between 0 - 31");
 		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);

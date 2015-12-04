@@ -10,6 +10,8 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
+import message.FindMessage;
+import message.InsertMessage;
 import message.Message;
 import message.NotifyNewPredecessor;
 import message.NotifyNewSuccessor;
@@ -32,7 +34,6 @@ public class Peer_receive implements Runnable{
 	public int ID;
 	public String IPAddr;
 	public int portNum;
-	public int []fingerTable;
 	
 	public static ServerSocketChannel receiveSocket;
 	
@@ -99,6 +100,14 @@ public class Peer_receive implements Runnable{
 			{
 				updateFingerTable((SendFingerTable) message);
 			}
+			else if(message.isInsertMessage())
+			{
+				onReceiveInsertMessage((InsertMessage) message);
+			}
+			else if(message.isFindMessage())
+			{
+				onReceiveFindMessage((FindMessage) message);
+			}
 		}		
 	}
 	
@@ -143,14 +152,16 @@ public class Peer_receive implements Runnable{
 	{
 		//Notify the successor that I am the new predecessor
 		NotifyNewPredecessor notifyPredecessor = new NotifyNewPredecessor(ID, Peer.successor, ID);
-		Peer_send nPredecessor_thread = new Peer_send(notifyPredecessor, Configuration.peerIP, 6000 + notifyPredecessor.to);
-		new Thread(nPredecessor_thread).start();
+//		Peer_send nPredecessor_thread = new Peer_send(notifyPredecessor, Configuration.peerIP, 6000 + notifyPredecessor.to);
+//		new Thread(nPredecessor_thread).start();
+		sendMessage(notifyPredecessor);
 		
 		
 		//Notify the predecessor that I am the new successor
 		NotifyNewSuccessor notifySuccessor = new NotifyNewSuccessor(ID, Peer.predecessor, ID);
-		Peer_send nSuccessor_thread = new Peer_send(notifySuccessor, Configuration.peerIP, 6000 + notifySuccessor.to);
-		new Thread(nSuccessor_thread).start();
+//		Peer_send nSuccessor_thread = new Peer_send(notifySuccessor, Configuration.peerIP, 6000 + notifySuccessor.to);
+//		new Thread(nSuccessor_thread).start();
+		sendMessage(notifySuccessor);
 	}
 	
 	private void updateSuccessor(NotifyNewSuccessor newSuccessor)
@@ -173,9 +184,134 @@ public class Peer_receive implements Runnable{
 	
 	private void updateFingerTable(SendFingerTable message)
 	{
-		this.fingerTable = message.finger_table;
+		Peer.fingerTable = message.finger_table;
 		System.out.println("Updating finger table ");
-		System.out.println(Arrays.toString(fingerTable));
+		System.out.println(Arrays.toString(Peer.fingerTable));
 	}
 	
+	private void onReceiveInsertMessage(InsertMessage message)
+	{
+		int key_val = Integer.parseInt(message.key) % 32;
+		//The key belongs to me and I am the first peer in the system
+		if((Peer.ID < Peer.predecessor) && (key_val <= Peer.ID) && (key_val  >= 0))
+		{
+			Peer.storage.put(message.key, message.value);
+			System.out.println(Peer.storage);
+		}
+		else if((Peer.ID < Peer.predecessor) && (key_val  > Peer.predecessor))
+		{
+			Peer.storage.put(message.key, message.value);
+			System.out.println(Peer.storage);
+		}
+		//The key belongs to me and I am not the first peer in the system
+		else if((key_val <= Peer.ID) && (key_val  > Peer.predecessor))
+		{	
+			Peer.storage.put(message.key, message.value);
+			System.out.println(Peer.storage);
+		}
+		//The key belongs to the successor
+		else if((key_val > Peer.ID) && (key_val <= Peer.successor))
+		{
+			InsertMessage new_message = new InsertMessage(Peer.ID, Peer.successor, message.key, message.value);
+			sendMessage(new_message);
+		}
+		//Route based on finger table
+		else
+		{
+			for(int i = 0; i < 5; i++)
+			{
+				if(Peer.fingerTable[i] >= key_val)
+				{
+					InsertMessage new_message = new InsertMessage(Peer.ID, Peer.fingerTable[i], message.key, message.value);
+					sendMessage(new_message);
+					break;
+				} else if(i == 4)
+				//Last entry in the finger table is still less than the search key, route to the last entry peer
+				{
+					InsertMessage new_message = new InsertMessage(Peer.ID, Peer.fingerTable[4], message.key, message.value);
+					sendMessage(new_message);
+					break;
+				}
+			}
+		}
+	}
+	
+	private void onReceiveFindMessage(FindMessage message)
+	{
+		String key = message.key;
+		int key_val = Integer.parseInt(key) % 32;
+		//The key belongs to me and I am the first peer in the system
+		if((Peer.ID < Peer.predecessor) && (key_val <= Peer.ID) && (key_val  >= 0))
+		{
+			if(Peer.storage.containsKey(key))
+			{
+				String value = Peer.storage.get(key);
+				System.out.println("Found the Message with key " + key);
+				System.out.println("The value is " + value);
+			}
+			else 
+			{
+				System.out.println("There is no message with key " + key);
+			}
+		}
+		else if((Peer.ID < Peer.predecessor)  && (key_val  > Peer.predecessor))
+		{
+			if(Peer.storage.containsKey(key))
+			{
+				String value = Peer.storage.get(key);
+				System.out.println("Found the Message with key " + key);
+				System.out.println("The value is " + value);
+			}
+			else 
+			{
+				System.out.println("There is no message with key " + key);
+			}
+		}
+		//The key belongs to me and I am not the first peer in the system
+		else if((key_val <= Peer.ID) && (key_val  > Peer.predecessor))
+		{
+			
+			if(Peer.storage.containsKey(key))
+			{
+				String value = Peer.storage.get(key);
+				System.out.println("Found the Message with key " + key);
+				System.out.println("The value is " + value);
+			}
+			else 
+			{
+				System.out.println("There is no message with key " + key);
+			}
+		}
+		//The key belongs to the successor
+		else if((key_val > Peer.ID) && (key_val <= Peer.successor))
+		{
+			FindMessage new_message = new FindMessage(Peer.ID, Peer.successor, key);
+			sendMessage(new_message);
+		}
+		//Route based on finger table
+		else
+		{
+			for(int i = 0; i < 5; i++)
+			{
+				if(Peer.fingerTable[i] >= key_val)
+				{
+					FindMessage new_message = new FindMessage(Peer.ID, Peer.fingerTable[i], key);
+					sendMessage(new_message);
+					break;
+				} else if(i == 4)
+				//Last entry in the finger table is still less than the search key, route to the last entry peer
+				{
+					FindMessage new_message = new FindMessage(Peer.ID, Peer.fingerTable[4], key);
+					sendMessage(new_message);
+					break;
+				}
+			}
+		}
+	}
+	
+	private void sendMessage(Message message)
+	{
+		Peer_send new_message_thread = new Peer_send(message, Configuration.peerIP, 6000 + message.to);
+		new Thread(new_message_thread).start();
+	}
 }
