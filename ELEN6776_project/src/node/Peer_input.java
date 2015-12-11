@@ -153,23 +153,25 @@ public class Peer_input implements Runnable{
 		{
 			for(int i = 0; i < 5; i++)
 			{
-				if(Peer.fingerTable[i] >= key_val)
-				{
-					InsertMessage new_message = new InsertMessage(Peer.ID, Peer.fingerTable[i], key, value);
-					sendMessage(new_message);
-					break;
-				} else if(i == 4)
-				//Last entry in the finger table is still less than the search key, route to the last entry peer
-				{
-					InsertMessage new_message = new InsertMessage(Peer.ID, Peer.fingerTable[4], key, value);
-					sendMessage(new_message);
-					break;
-				} else if((Peer.fingerTable[i] > Peer.fingerTable[i+1]) && (key_val < 32))
+				if(Peer.fingerTable[i+1] >= key_val)
 				{
 					InsertMessage new_message = new InsertMessage(Peer.ID, Peer.fingerTable[i], key, value);
 					sendMessage(new_message);
 					break;
 				}
+				else if((Peer.fingerTable[i] > Peer.fingerTable[i+1]) && (key_val < 32))
+				{
+					InsertMessage new_message = new InsertMessage(Peer.ID, Peer.fingerTable[i], key, value);
+					sendMessage(new_message);
+					break;
+				}
+				else if(i == 3)
+				//Last entry in the finger table is still less than the search key, route to the last entry peer
+				{
+					InsertMessage new_message = new InsertMessage(Peer.ID, Peer.fingerTable[4], key, value);
+					sendMessage(new_message);
+					break;
+				} 
 			}
 		}
 	}
@@ -230,23 +232,25 @@ public class Peer_input implements Runnable{
 		{
 			for(int i = 0; i < 5; i++)
 			{
-				if(Peer.fingerTable[i] >= key_val)
-				{
-					FindMessage new_message = new FindMessage(Peer.ID, Peer.fingerTable[i], key);
-					sendMessage(new_message);
-					break;
-				} else if(i == 4)
-				//Last entry in the finger table is still less than the search key, route to the last entry peer
-				{
-					FindMessage new_message = new FindMessage(Peer.ID, Peer.fingerTable[4], key);
-					sendMessage(new_message);
-					break;
-				} else if((Peer.fingerTable[i] > Peer.fingerTable[i+1]) && (key_val < 32))
+				if(Peer.fingerTable[i+1] > key_val)
 				{
 					FindMessage new_message = new FindMessage(Peer.ID, Peer.fingerTable[i], key);
 					sendMessage(new_message);
 					break;
 				}
+				else if((Peer.fingerTable[i] > Peer.fingerTable[i+1]) && (key_val < 32))
+				{
+					FindMessage new_message = new FindMessage(Peer.ID, Peer.fingerTable[i], key);
+					sendMessage(new_message);
+					break;
+				}
+				else if(i == 3)
+				//Last entry in the finger table is still less than the search key, route to the last entry peer
+				{
+					FindMessage new_message = new FindMessage(Peer.ID, Peer.fingerTable[4], key);
+					sendMessage(new_message);
+					break;
+				} 
 			}
 		}
 	}
